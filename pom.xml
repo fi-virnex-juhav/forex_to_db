@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.1</version>
+        <!--
+        <relativePath/> --> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>fi.virnex.juhav</groupId>
+    <artifactId>forex_to_db</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>forex_to_db</name>
+    <description>Spring Boot Command line to store forex data in a docker postgreSQL DB</description>
+
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        
+        <!-- added for json parsing byz --> 
+        <dependency>
+     		<groupId>net.pwall.json</groupId>
+      		<artifactId>json-simple</artifactId>
+      		<version>1.5.5</version>
+    	</dependency>
+    	
+    	<!-- added to query external forex API byz -->
+    	
+    	<dependency>
+    		<groupId>com.squareup.okhttp3</groupId>
+   	 		<artifactId>okhttp</artifactId>
+    		<!-- 4.9.1 -->
+		</dependency>
+		
+		<!-- added for DB support -->
+		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		<dependency>
+    		<groupId>org.postgresql</groupId>
+    		<artifactId>postgresql</artifactId>
+    		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
+		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-data-jpa</artifactId>
+    		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc -->
+		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-jdbc</artifactId>
+    		</dependency>
+
+    	<!--
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>2.3.2</version>
+        </dependency>
+        -->
+        
+        <!-- trying to learn to JUnit test containers byz -->
+        <!-- https://faustxvi.github.io/junit5-docker/ -->
+         <dependency>
+  			<groupId>com.github.faustxvi</groupId>
+  			<artifactId>junit5-docker</artifactId>
+  			<version>1.0.0-RC5</version>
+  			<scope>test</scope>
+  		</dependency>
+  		
+  		<!-- from another test containers intro byz -->
+  		<!-- https://www.youtube.com/watch?v=-mYJKwrySOw -->
+		<!-- replacing ${testcontainers.version} with 1.17.0 -->
+		<dependency>
+    		<groupId>org.junit.jupiter</groupId>
+    		<artifactId>junit-jupiter</artifactId>
+    		<version>5.8.1</version>
+    		<scope>test</scope>
+		</dependency>
+		<dependency>
+    		<groupId>org.testcontainers</groupId>
+    		<artifactId>testcontainers</artifactId>
+    		<version>1.17.3</version>
+    		<scope>test</scope>
+		</dependency>
+		<dependency>
+    		<groupId>org.testcontainers</groupId>
+    		<artifactId>junit-jupiter</artifactId>
+    		<version>1.17.3</version>
+    		<scope>test</scope>
+		</dependency>
+  		 <dependency>
+  			<groupId>org.testcontainers</groupId>
+  			<artifactId>postgresql</artifactId>
+  			<version>1.17.3</version>
+  			<scope>test</scope>
+  		 </dependency>
+  		 
+  		 <!-- modified old dependency - exclusions byz -->  		
+         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+            	<exclusion>
+            		<groupId>org.junit.vintage</groupId>
+            		<artifactId>junit-vintage-engine</artifactId>
+            	</exclusion>
+            </exclusions>
+         </dependency>  		
+  		
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+         </plugins>
+         <finalName>forex_to_db</finalName>
+    </build>
+</project>

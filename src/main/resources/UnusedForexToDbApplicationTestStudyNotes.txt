@@ -1,0 +1,306 @@
+package fi.virnex.juhav.forex_to_db;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.junit.ClassRule;
+import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+// added 3 no 2 imports byz
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
+// import org.springframework.test.context.web.WebAppConfiguration;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import com.github.junit5docker.Docker;
+import com.github.junit5docker.Port;
+import com.github.junit5docker.WaitFor;
+
+@ContextConfiguration(classes = ForexToDbApplication.class)
+@SpringBootTest
+class ForexToDbApplicationTest extends ForexToDbApplication {
+
+	@Test
+	void contextLoads() {
+
+		System.out.println("ForexToDbApplicationTest.contextLoads()");
+		// fail("Not yet implemented");
+	}
+}
+
+////////////BELOW SAVED JUNK FROM STUDIES RELATED TO TESTING DOCKER CONTAINERS///////////
+///RAN OUT OF TIME ON TESTING OF MULTICONTAINER (2) APPS///
+
+/*
+	//volumes:
+	//- forex_vol:/var/lib/postgresql/data
+
+
+@Docker(image = "postgres", ports = @Port(exposed = 5432, inner = 5432),
+environments = {
+		@Environment (key = "POSTGRES_USER", value="postgres"),
+		@Environment (key = "POSTGRES_PASSWORD", value="postgres"),
+		@Environment (key = "POSTGRES_DB", value="forex_db"),
+		@Environment (key = "FOREX_DATA", value="/var/lib/postgresql/data/forex_data")
+}, waitFor = @WaitFor("database system is ready to accept connections"))
+
+	// waitFor = @WaitFor("mysqld: ready for connections"))
+*/
+
+/*
+@ContextConfiguration(classes = ForexToDbApplication.class)
+@SpringBootTest
+class ForexToDbApplicationTest extends ForexToDbApplication {
+
+	// void testMain() {
+
+	@Test
+	void contextLoads() {
+
+		// fail("Not yet implemented");
+	}
+
+	@Test
+	void testRun() {
+		
+		// fail("Not yet implemented");
+	}
+
+}
+*/
+
+/*
+@Testcontainers
+@SpringBootTest
+class ForexToDbApplicationTest extends ForexToDbApplication {
+	
+	//baeldung:
+	//https://www.baeldung.com/spring-boot-testcontainers-integration-test
+	
+	@RunWith(SpringRunner.class)
+	@SpringBootTest
+	@ContextConfiguration(initializers = {ForexToDbApplication.Initializer.class})
+	public class UserRepositoryTCIntegrationTest extends UserRepositoryCommonIntegrationTests {
+
+	    @ClassRule
+	    public static PostgreSQLContainer container = new PostgreSQLContainer("postgres:11.1")
+	      .withDatabaseName("forex_to_db_test_db")
+	      .withUsername("postgres")
+	      .withPassword("postgres");
+
+	    static class Initializer
+	      implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+	        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
+	            TestPropertyValues.of(
+	              "spring.datasource.url=" + container.getJdbcUrl(),
+	              "spring.datasource.username=" + container.getUsername(),
+	              "spring.datasource.password=" + container.getPassword()
+	            ).applyTo(configurableApplicationContext.getEnvironment());
+	        }
+	    }
+	}
+	*/
+	/*
+	@Container
+	public static PostgreSQLContainer container = (PostgreSQLContainer) new PostgreSQLContainer()
+			.withUsername("postgres")
+			.withPassword("postgres")
+			.withDatabaseName("forex_db")
+			.withExposedPorts(5432);
+	
+	
+	//@Autowired
+	//private BookRepository bookRepository;
+
+	
+	// > 2.2.6
+	@DynamicPropertySource
+	static void properties(DynamicPropertyRegistry registry) {
+		registry.add("spring.datasource.url", container::getJdbcUrl);
+		registry.add("spring.datasource.username", container::getUsername);
+		registry.add("spring.datasource.password", container::getPassword);
+	}
+	
+	@Test
+	void contextLoads() {
+		System.out.println("Context Loads!");
+		
+		
+		//Book book = new Book();
+		//book.setName("Testcontainers");
+		//bookRepository.save(book);
+		
+	}
+}
+*/
+/*
+public class MyAwesomeTest {
+
+@Test
+void checkMyCode() {
+// Add your test content here
+}
+
+@Test
+void checkMyCodeWithAnotherContainer() {
+// Add your test content here
+}
+
+}
+*/
+/*
+package fi.virnex.juhav.forex_to_db;
+
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.output.OutputFrame;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import fi.virnex.juhav.forex_to_db.model.ForexRate;
+import fi.virnex.juhav.forex_to_db.repository.IForexRepository;
+
+import java.io.IOException;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@Testcontainers
+public class TestDBOnly {
+	
+	@Autowired
+	private IForexRepository repository;
+           
+   @Container
+   private static PostgreSQLContainer db_container = (PostgreSQLContainer) new PostgreSQLContainer("postgres:latest")
+   	.withDatabaseName("forex_db_test_db")
+   	.withUsername("postgres")
+   	.withPassword("postgres")
+   	.withExposedPorts(5432);
+   
+   //.withReuse(true) e.g. for generic containers to reduce start-up wait-time.
+	// do not restart an existing container.
+   // This feature may be an early release under development.
+   // You need to have an extra properties file in home dir:
+   // .testcontainers.properties:
+   // ?maybe not needed anymore line below?  
+   // docker.client.strategy=org.testcontainers.dockerclient.NpipeSocketClientProviderStrategy
+   // testcontainers.reuse_enable=true 
+ 
+   
+   //	.withDatabaseName("somedatabase")
+   //	.withUsername("root")
+   //	.withPassword("letsgobrandon");
+   // the property values above need to match application.properties
+   
+   // To reduce start-up time of tests:
+   //	.withReuse(true);
+   // AND file .testcontainers.properties home directory:
+   // testcontainers.reuse.enable=true
+   
+   // Note that annotations like below are also available;
+   // @BeforeAll
+   // public static void beforeAll() {
+   //    container.start();
+   // }
+   
+   //	.withExposedPorts(3306); 
+   // unused but explained in the video:
+   // guarantees that DB has booted up completely.
+   // poll until the port is available from the container. 
+   // useful especially with generic container.
+   // Otherwise Testcontainers can not know when the container 
+   // launched by docker from an image has booted up and is ready.
+   // Very useful with generic containers e.g. REST-API!
+   // It is a kind of wait for.
+   
+   // you can also create multiple containers:
+    */
+
+   /*
+   @Container
+   private static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer("rabbitmq:latest");
+   	.with
+   */
+   
+   // you can also create a generic container for whatever image:
+   /*
+   @Container
+   private static GenericContainer genericContainer = new GenericContainer("myimage:mytag");
+   */
+   
+   /*
+   For multi-container apps like DB with java SB app:
+	search engine: "Testcontainers advanced networking"
+	https://www.testcontainers.org/features/networking/
+	testcontainers - advanced: address without d in the end:
+	https://www.theswdeveloper.com/post/testcontainers-advance
+   */
+
+/*
+   @DynamicPropertySource
+   public static void overrideProps(DynamicPropertyRegistry registry) {
+      registry.add("spring.datasource.url", db_container::getJdbcUrl);
+      registry.add("spring.datasource.username", db_container::getUsername);
+      registry.add("spring.datasource.password", db_container::getPassword);
+   }  
+   
+   // our SQL file /testcontainers-demo-main/src/main/resources/schema.sql inserts 3 rows to the empty DB:
+   @Test
+   void when_using_a_clean_db_we_should_have_0_rows() {	
+       List<ForexRate> rows = repository.findAll();
+       System.out.println("rows in DB: " + rows.size() );
+       assertThat(rows).hasSize(0);
+   }
+       
+   /*
+   @Test
+   void xyx() {
+   	// for a file you can allow the container to READ_ONLY or READ_WRITE:
+   	// (filePathOnLocalHost, filePathInContainer, BindMode.READ_WRITE); 
+   	container.withClasspathResourceMapping("application.properties", 
+   			"/tmp/application.properties", BindMode.READ_ONLY);
+   	container.withFileSystemBind("C:\\dev\\application.properties",
+   			"/tmp/app.prop", BindMode.READ_ONLY);
+   	// run some command in container:
+   	try {
+			container.execInContainer("ls", "-la");
+		} catch (UnsupportedOperationException e) {
+			System.out.println("Exceptio " + e + " in ...");
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String logs = container.getLogs(OutputFrame.OutputType.STDOUT);
+		
+		// container.withLogConsumer(new Slf4jLogConsumer(.logs..));
+		
+		// If you want to know mapped port:
+		// The port in the container is 3306
+		// Find out the port on your local machine:
+		Integer portOnLocalHost = container.getMappedPort(3306);
+   }
+  
+}
+*/
