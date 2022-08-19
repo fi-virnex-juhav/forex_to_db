@@ -1,9 +1,6 @@
 package fi.virnex.juhav.forex_to_db.DTO;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /*
 Example of a json response from the API on web:
@@ -25,6 +22,7 @@ Example of a json response from the API on web:
  */
 
 // changed java Date to String everywhere as it causes errors, parsing+DB
+
 
 public class ForexResponseDTO {
 	

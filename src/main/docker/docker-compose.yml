@@ -18,6 +18,7 @@ version: "3"
 # run_max_hours=7  -> run queries once immediately and repeat at every next full hour 7 times.   
 # restart: [always, unless-stopped, on-failure, "no"]
 # restart: "no" with quotes because in yaml no is interpreted as false!
+# depends_on forex_db means spin up after forex_db is running
 services:
     forex_to_db:
       image: 'forex_to_db:latest'
@@ -34,16 +35,35 @@ services:
       restart: "no"
       depends_on:
         - forex_db
+
+# browser UI to the posgreSQL DB (not necessary)
+# https://youtu.be/nlk0QlPdbcY
+
+    adminer:
+      image: adminer
+      container_name: adminer
+      environment:
+        - POSTGRES_USER=postgres
+      ports:
+        - 8007:8080
+      restart: "no"
+      depends_on:
+      - forex_db
+
     forex_db:
       image: postgres
       container_name: forex_db
+      env_file: db.conf
       environment:
         - POSTGRES_USER=postgres
         - POSTGRES_PASSWORD=postgres
         - POSTGRES_DB=forex_db
         - FOREX_DATA=/var/lib/postgresql/data/forex_data
+
       ports:
-        - 5432:5432
+        - "5432:5432"
+      expose:
+      - "5432" 
       volumes:
         - forex_vol:/var/lib/postgresql/data
       restart: unless-stopped

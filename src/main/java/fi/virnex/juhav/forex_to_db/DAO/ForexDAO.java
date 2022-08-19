@@ -1,33 +1,31 @@
 package fi.virnex.juhav.forex_to_db.DAO;
 
-import java.net.http.HttpRequest.Builder;
-import java.net.http.HttpResponse;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fi.virnex.juhav.forex_to_db.DTO.ForexRequestDTO;
 import fi.virnex.juhav.forex_to_db.DTO.ForexResponseDTO;
-import net.pwall.json.JSONSimple;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.net.URL;
 
-// apikey = "vGLeIBxS5cqpW6nbrEEIIbzWGmmCAbEF";  // apikey on 2022-06-20
+// apikey = "xxx";  // apikey on 2022-06-20
 
 // only static methods and final constants on class level here
 
 public class ForexDAO {
 
-
-	// example old apikey = "vGLeIBxS5cqpW6nbrEEIIbzWGmmCAbEF";
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+	
+	// example old apikey = "xxx";
 
 	private static final String EXCEPTION_HEAD_JSON = "{Exception:";
 	private static final String ERROR_HEAD_JSON = "{\"message\":";
@@ -60,7 +58,7 @@ public class ForexDAO {
 		Request request = new Request.Builder()
 				.url(urlString)
 				.addHeader("apikey", apikey )
-				//.addHeader("apikey", "vGLeIBxS5cqpW6nbrEEIIbzWGmmCAbEF")
+				//.addHeader("apikey", "xxx")
 				.method("GET", null)
 				.build();
 
@@ -78,34 +76,8 @@ public class ForexDAO {
 			return EXCEPTION_HEAD_JSON + e.toString() + EXCEPTION_TAIL_JSON; 
 		}
 	}
-
-	//OLD UNUSED, MAYBE USEFUL LATER SOMEWHERE
-	private static Optional<Object> parseServerError(String serverError) {
-
-		Optional<Object> returnValueIfNull = Optional.ofNullable((Object) serverError);
-
-		if (returnValueIfNull.isEmpty()) {
-			String bug = "--- BUG1 outside of remote Exchange Rate API server: ForexDAO.parseServerError called with a null String";
-			Optional<Object> optionalBug = Optional.of( (Object) bug);
-			return optionalBug;
-		}
-
-		// my current API server side error:
-		// ... "{"message":"You have exceeded your daily\/monthly API rate limit. Please review and upgrade your subscription plan at https:\/\/promptapi.com\/subscriptions to continue."}"
-
-		String msg = serverError.replace("\"", "");
-		msg = msg.replace(":", "");
-		msg = msg.replace("{", "");
-		msg = msg.replace("}", "");
-		String expectedSubstring = "message";
-		int index = msg.indexOf(expectedSubstring);
-		if (index >= 0 ) {
-			msg = msg.substring(index + expectedSubstring.length());
-		}
-		return Optional.of(msg);
-	}
-
-	private static ForexResponseDTO forexResponseDTO = new ForexResponseDTO();
+	
+	// private static ForexResponseDTO forexResponseDTO = new ForexResponseDTO();
 
 	private static final LocalDateTime getDateTimeFromTimestamp(long timestamp) {
 		if (timestamp == 0)
@@ -134,6 +106,8 @@ public class ForexDAO {
 
 
 	// Beef of the burger {
+	
+	// return either a ForexResponseDTO object or an error String in json format.
 
 	public static final Optional<Object> fetch( 
 			ForexRequestDTO forexRequestDTO,
@@ -147,85 +121,30 @@ public class ForexDAO {
 		String json = null;
 
 		json = getCurrencyExchangeJson( forexRequestDTO.getFromAmount(), forexRequestDTO.getFromCurrency(), forexRequestDTO.getToCurrency(), apikey);
-
-		if ( json == null ) {
-			System.out.println("--- json == " + json);
-			return Optional.of(json);
-		} 
-
-		if ( json.startsWith(EXCEPTION_HEAD_JSON) || json.startsWith(ERROR_HEAD_JSON)) {
-			System.out.println("--- json : " + json );
-			return Optional.of(json);
+		
+		ForexDataFromJson forexDataFromJson = new ForexDataFromJson(json, objectMapper);
+		
+		if (forexDataFromJson.isSuccessFromApi() == false ) {
+			return Optional.of( "{ ExternalApiReturnedSuccess: " +  false + "}" );
+		}
+		
+		if ( forexDataFromJson.isJsonParsingSuccess() == false ) {
+			return	Optional.of( 
+					"{ " 
+					+ "ExceptionWhileParsingJson: " + forexDataFromJson.getNameOfException() + " ,"
+					+ "json: " + forexDataFromJson.getJson()
+					+ " }" 
+					);
 		}
 
-		System.out.println("+++ json: " + json );
+		System.out.println("+++ json: " + forexDataFromJson.getJson() );
 
-		// from here on any problem is in parsing of the json format	
+		ForexResponseDTO forexResponseDTO = forexDataFromJson.getForexResponseDTO();
 
-		Optional<Object> response = Optional.ofNullable(null);
+		System.out.println("+++ response : " + forexResponseDTO.toJson() );
 
-		try {
-			// JsonParser springParser = JsonParserFactory.getJsonParser();
+		return Optional.of(forexResponseDTO);
 
-			@SuppressWarnings("unchecked")
-			Map<String,?> map = (Map<String, ?>) JSONSimple.parse(json);
-
-			boolean success = (boolean) map.get("success");
-
-			Map<String, ?> query = (Map<String, ?>) map.get("query");
-
-			String fromCurrency = (String) query.get("from");
-			String toCurrency   = (String) query.get("to");
-			int fromAmount = (int) query.get("amount");
-
-			Map<String,?> info = (Map<String, ?>) map.get("info");
-
-			// the app logic requires time hh:mm:ss information, so timestamp from forex API is converted to DateTime.
-			// the json response from API contains only date (without time) and the timestamp that is used here.
-			long timestamp = (int) info.get("timestamp");
-
-			String rateDate = getDateTimeAsString(getDateTimeFromTimestamp(timestamp));
-
-			BigDecimal bdExchangeRate = (BigDecimal) info.get("rate");
-
-			double exchangeRate =  bdExchangeRate.doubleValue();
-
-			// String dateString = (String) map.get("date");
-
-			// System.out.println( "dateString : " + dateString );
-
-			/*
-			// DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-			Date date = dateFormat.parse(dateString);  
-			 */
-
-			// String rateDate = (String) map.get("date"); // there is no time information, timestamp used above
-
-			BigDecimal bdToAmount = (BigDecimal) map.get("result");
-
-			double toAmount = bdToAmount.doubleValue();	// to-amount
-
-			forexResponseDTO.setRateDate(rateDate);
-			forexResponseDTO.setFromAmount(fromAmount);
-			forexResponseDTO.setFromCurrency(fromCurrency);
-			forexResponseDTO.setToAmount(toAmount);
-			forexResponseDTO.setToCurrency(toCurrency);	
-			forexResponseDTO.setExchangeRate(exchangeRate);
-
-			System.out.println("+++ response : " + forexResponseDTO.toJson() );
-
-			response = Optional.of(forexResponseDTO);
-
-		} catch (Exception e) {
-			String jsonParsingErrorMessage = "Exception while parsing json in ForexDAO.fetch() : " + e.toString();
-			System.out.println("--- " + jsonParsingErrorMessage);
-			response = Optional.of( EXCEPTION_HEAD_JSON + e.toString() + EXCEPTION_TAIL_JSON );
-		}
-
-		return response;
 	}
 
 	// Beef of the burger }

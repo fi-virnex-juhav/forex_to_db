@@ -1,7 +1,0 @@
-fi\virnex\juhav\forex_to_db\DTO\ForexRequestDTO.class
-fi\virnex\juhav\forex_to_db\model\ForexRate.class
-fi\virnex\juhav\forex_to_db\non_web_service\NonWebService.class
-fi\virnex\juhav\forex_to_db\DAO\ForexDAO.class
-fi\virnex\juhav\forex_to_db\DTO\ForexResponseDTO.class
-fi\virnex\juhav\forex_to_db\ForexToDbApplication.class
-fi\virnex\juhav\forex_to_db\repository\IForexRepository.class

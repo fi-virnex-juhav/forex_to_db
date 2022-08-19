@@ -2,6 +2,7 @@ C:\Users\JuhaVälimäki\eclipse-space\forex_to_db\src\main\java\fi\virnex\juhav\fo
 C:\Users\JuhaVälimäki\eclipse-space\forex_to_db\src\main\java\fi\virnex\juhav\forex_to_db\model\ForexRate.java
 C:\Users\JuhaVälimäki\eclipse-space\forex_to_db\src\main\java\fi\virnex\juhav\forex_to_db\non_web_service\NonWebService.java
 C:\Users\JuhaVälimäki\eclipse-space\forex_to_db\src\main\java\fi\virnex\juhav\forex_to_db\unused\ExampleJob.java
+C:\Users\JuhaVälimäki\eclipse-space\forex_to_db\src\main\java\fi\virnex\juhav\forex_to_db\DAO\ForexDataFromJson.java
 C:\Users\JuhaVälimäki\eclipse-space\forex_to_db\src\main\java\fi\virnex\juhav\forex_to_db\DTO\ForexRequestDTO.java
 C:\Users\JuhaVälimäki\eclipse-space\forex_to_db\src\main\java\fi\virnex\juhav\forex_to_db\DAO\ForexDAO.java
 C:\Users\JuhaVälimäki\eclipse-space\forex_to_db\src\main\java\fi\virnex\juhav\forex_to_db\repository\IForexRepository.java

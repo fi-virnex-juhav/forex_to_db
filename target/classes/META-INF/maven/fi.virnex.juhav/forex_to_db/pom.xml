@@ -25,12 +25,19 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
         
-        <!-- added for json parsing byz --> 
+        <!-- old: was added for json parsing : replaced below by a more standard jackson. byz 
         <dependency>
      		<groupId>net.pwall.json</groupId>
       		<artifactId>json-simple</artifactId>
       		<version>1.5.5</version>
-    	</dependency>
+    	</dependency>  
+    	-->
+    	
+    	<dependency>
+    		<groupId>com.fasterxml.jackson.core</groupId>
+    		<artifactId>jackson-databind</artifactId>
+    		<version>2.13.3</version>
+		</dependency>
     	
     	<!-- added to query external forex API byz -->
     	

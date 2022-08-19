@@ -18,7 +18,7 @@ import java.util.Properties;
 
 public class ExampleJob implements Job {
 	
-	// params.apikey=vGLeIBxS5cqpW6nbrEEIIbzWGmmCAbEF in application.properties
+	// params.apikey=xxx in application.properties
 
 	private static final String JSON = 
 			"{ " 

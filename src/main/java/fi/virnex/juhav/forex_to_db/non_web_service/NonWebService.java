@@ -116,7 +116,9 @@ public class NonWebService {
     	boolean immediateFirstCollection = true;
     	
     	// if runMaxHoursCount == -1 then repeat forever.
-    	while ( (runMaxHoursCount == -1) || (periodicRepetitionCount < runMaxHoursCount )) {
+    	while ( (runMaxHoursCount == -1) 
+    			|| (periodicRepetitionCount < runMaxHoursCount ) 
+    			|| immediateFirstCollection ) {
     	    		
        		// The first collection is run immediately and not counted.
     		// Only periodic repetitions are counted.
@@ -197,7 +199,7 @@ public class NonWebService {
 			Optional<Object> response = ForexDAO.fetch(forexRequestDTO, apikey);
 
 			if (response.isPresent()) {
-				if ( ((Object) response.get()).getClass() == fi.virnex.juhav.forex_to_db.DTO.ForexResponseDTO.class ) {
+				if ( ((Object) response.get()).getClass() == ForexResponseDTO.class ) {
 				   ForexResponseDTO forexResponseDTO = (ForexResponseDTO) response.get();
 				   
 				   ForexRate forexRateBeforeSave = new ForexRate();
